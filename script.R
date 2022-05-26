@@ -3,6 +3,7 @@ Anmerkungen <- FALSE
 
 
 ###[ Task 1 ]###################################################################
+
 # import "readr" library (necessary to import data)
 library(readr)
 
@@ -17,6 +18,7 @@ animal <- read_delim(
 
 
 ###[ Task 2 ]###################################################################
+
 # create data frame (fundamental data structure of R to operate on)
 # from imported data
 data <- data.frame(animal)
@@ -37,35 +39,39 @@ data_animals <- subset(
     )
 )
 
-# initialize/create empty array/vector to write results into later
-animals_count <- c()
+# count elements in subset of data_animals that are not empty per row 
+# and store the result vector to new variable
+animal_count_per_row <- rowSums(!is.na(data_animals))
 
-# loop through rows of table/matrix
-for (row_person in seq_len(nrow(data_animals))) {
+# combine relevant data to solution
+# by creating a copy of data_animals
+solution_task_2 <- data_animals
+# and adding animal_count_per_row to the solution matrix
+solution_task_2["Anzahl_Tiere"] <- animal_count_per_row
 
-    # set initial value of row/person to 0
-    # because the default value would be NULL
-    # and incrementing NULL would be impossible
-    animals_count[row_person] <- 0
 
-    # loop through columns of current row
-    for (column_animal in seq_len(ncol(data_animals))) {
+###[ Task 3 ]###################################################################
 
-        # if field/element is not empty
-        if (!is.na(data_animals[row_person, column_animal])) {
-            # print each animal to console
-            # print(data_animals[row_person, column_animal])
+### Hund_val_0 ~ Hund_fam_0
 
-            # increment animals_count of current row/person
-            animals_count[row_person] <- animals_count[row_person] + 1
-        }
-    }
-}
+# create a linear model for the connection between valance and familiarity for dogs
+liner_model_dog_val_fam <- lm(Hund_val_0 ~ Hund_fam_0,data = data)
 
-# add column "Anzahl_Tiere" to data_animals variable
-# with the solution array/vector animals_count
-data_animals["Anzahl_Tiere"] <- animals_count
+# create a array/vector which imaginative values of familiarity
+fam_test_data <- data.frame(Hund_fam_0=c(0,10,50,100))
 
-# print result
-print(data_animals)
-View(data_animals)
+# predict how much valence a person with the given familiarity would have
+# via the linear model
+predict(liner_model_dog_val_fam,newdata = fam_test_data)
+
+### Hund_fam_0 ~ Hund_val
+
+# create a linear model for the connection between valance and familiarity for dogs
+liner_model_dog_fam_val <- lm(Hund_fam_0 ~ Hund_val_0,data = data)
+
+# create a array/vector which imaginative values of valence
+val_test_data <- data.frame(Hund_val_0=c(0,10,50,100))
+
+# predict how much familiarity a person with the given valence would have
+# via the linear model
+predict(liner_model_dog_fam_val,newdata = val_test_data)
